@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Garage | User Vehicle Portal</title>
+
+<style>
+/* ================= GLOBAL ================= */
+* { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",sans-serif;}
+body { background: linear-gradient(135deg,#1c3b57 0%,#0a0e17 100%); color:#fff; overflow-x: hidden; min-height: 100vh;}
+
+/* ================= BLOBS ================= */
+.blob { position:fixed; border-radius:50%; filter:blur(90px); opacity:0.4; z-index:-1;}
+.blob-1 { top:-10%; left:-10%; width:500px; height:500px; background:#2a5298;}
+.blob-2 { bottom:-10%; right:-10%; width:600px; height:600px; background:#4a1c40; }
+
+/* ================= NAV ================= */
+nav { display:flex; justify-content:space-between; align-items:center; padding:1.5rem 6%; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); }
+.logo { font-size: 1.6rem; font-weight: 800; color: #3dff88; letter-spacing: 1px; }
+nav div a { color:#ddd; text-decoration:none; margin-left:2rem; font-weight:500; transition: 0.3s;}
+nav div a:hover { color:#3dff88; }
+.logout-btn { color: #ff5c5c !important; }
+
+/* ================= HERO ================= */
+.hero-container { display:flex; align-items:center; justify-content:space-between; padding: 4rem 8% 2rem; flex-wrap: wrap; gap: 20px;}
+.text-content { flex:1; border-left:5px solid #3dff88; padding-left:30px;}
+.text-content h1 { font-size:3.2rem; font-weight:300;}
+.text-content h1 span { font-weight:700;}
+.text-content p { margin-top:15px; max-width:500px; color:#ccc; line-height:1.6; }
+.plate-badge { background: #fff; color: #000; padding: 12px 25px; border-radius: 8px; font-family:'Courier New', monospace; font-weight:900; font-size:2.2rem; border:4px solid #333; box-shadow:0 10px 20px rgba(0,0,0,0.5); }
+
+/* ================= DASHBOARD ================= */
+.section { padding:0 8% 80px; }
+.section-title { font-size:2.2rem; margin-bottom:35px; font-weight:600; }
+
+.info-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:24px; }
+.info-box { background: rgba(255,255,255,0.07); backdrop-filter:blur(14px); border-radius:18px; padding:22px; box-shadow:0 18px 40px rgba(0,0,0,0.3); transition:0.3s; position: relative; }
+.info-box:hover { transform:translateY(-6px); }
+.info-box h3 { margin-bottom:14px; padding-bottom:8px; border-bottom:1px solid rgba(255,255,255,0.2); font-size:1.2rem; color: #3dff88; }
+.info-item { display:flex; justify-content:space-between; font-size:0.95rem; margin-bottom:8px; color:#ddd; }
+
+/* Utility Colors & Buttons */
+.green { color:#3dff88; font-weight:600; }
+.red { color:#ff5c5c; font-weight:600; }
+.yellow { color:#ffd966; font-weight:600; }
+
+.btn-action { background:#3dff88; color:#000; border:none; padding:6px 14px; border-radius:4px; font-weight:700; cursor:pointer; transition:0.3s; font-size: 0.85em; }
+.btn-action:hover { background:#2ecc71; transform:scale(1.05); }
+.btn-edit { position: absolute; top: 20px; right: 20px; background: transparent; border: 1px solid #3dff88; color: #3dff88; padding: 4px 12px; border-radius: 4px; cursor: pointer; transition: 0.3s; font-size: 0.8em; font-weight: bold;}
+.btn-edit:hover { background: #3dff88; color: #000; }
+
+.violation-card { background: rgba(255,255,255,0.05); padding: 12px; margin-bottom: 10px; border-radius: 4px; border-left: 4px solid #dc3545; transition: 0.3s;}
+.violation-card.paid { border-left-color: #28a745; opacity: 0.7;}
+
+.status-badge { font-size: 0.8em; padding: 4px 8px; border-radius: 3px; font-weight: bold; }
+.status-badge.paid { background: rgba(40, 167, 69, 0.2); color: #28a745; }
+.status-badge.unpaid { background: rgba(220, 53, 69, 0.2); color: #dc3545; }
+
+#toast { position:fixed; bottom:30px; right:30px; background:#3dff88; color:#000; padding:15px 30px; border-radius:8px; font-weight:bold; display:none; z-index:1000; box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+
+/* ================= MODAL ================= */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 2000; }
+.modal-content { background: #1a2639; padding: 30px; border-radius: 12px; width: 90%; max-width: 400px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 40px rgba(0,0,0,0.5); }
+.modal-content h3 { color: #3dff88; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
+.modal-content label { display: block; font-size: 0.85em; color: #aaa; margin-bottom: 5px; }
+.modal-content input { width: 100%; padding: 10px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 5px; }
+.modal-content input:focus { outline: none; border-color: #3dff88; }
+.modal-buttons { display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px; }
+.btn-close { background: transparent; color: #ccc; border: 1px solid #ccc; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
+.btn-close:hover { background: #ccc; color: #000; }
+</style>
+</head>
+
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+<div id="toast"></div>
+
+<div class="modal-overlay" id="profileModal">
+    <div class="modal-content">
+        <h3>Edit Profile Settings</h3>
+        <form method="POST" action="{% url 'dashboard' %}">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="update_profile">
+            
+            <label>Full Name</label>
+            <input type="text" name="full_name" value="{{ owner_obj.full_name }}" required>
+
+            <label>Date of Birth</label>
+            <input type="date" name="date_of_birth" value="{{ owner_obj.date_of_birth|date:'Y-m-d' }}">
+
+            <label>Contact Number</label>
+            <input type="text" name="contact_number" value="{{ owner_obj.contact_number }}">
+
+            <label>Address</label>
+            <input type="text" name="address" value="{{ owner_obj.address }}">
+
+            <div style="display:flex; gap:10px;">
+                <div style="flex:1;">
+                    <label>City</label>
+                    <input type="text" name="city" value="{{ owner_obj.city }}">
+                </div>
+                <div style="flex:1;">
+                    <label>State</label>
+                    <input type="text" name="state" value="{{ owner_obj.state }}">
+                </div>
+            </div>
+
+            <div class="modal-buttons">
+                <button type="button" class="btn-close" onclick="closeModal()">Cancel</button>
+                <button type="submit" class="btn-action">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<nav>
+    <div class="logo">DRIVE<span>HUB</span></div>
+    <div>
+        <a href="{% url 'dashboard' %}">My Garage</a>    
+        <a href="javascript:void(0)" onclick="openModal()">Profile</a>    
+        <a href="{% url 'logout' %}" class="logout-btn">Logout</a>
+    </div>
+</nav>
+
+{% if messages %}
+    <div style="padding: 20px 8% 0;">
+    {% for message in messages %}
+        <div style="background: rgba(61,255,136,0.2); color: #3dff88; padding: 10px; border-radius: 5px; border: 1px solid #3dff88;">{{ message }}</div>
+    {% endfor %}
+    </div>
+{% endif %}
+
+{% if vehicles_data %}
+    {% for data in vehicles_data %}
+    <div class="hero-container">
+        <div class="text-content">
+            <h1>Vehicle <span>Owner Portal</span></h1>
+            <p>Welcome back, <strong>{{ data.owner.full_name }}</strong>. Below is the complete intelligence dossier for your registered vehicle.</p>
+        </div>
+        <div>
+            <div class="plate-badge">{{ data.plate }}</div>
+        </div>
+    </div>
+
+    <section class="section">
+        <div class="info-grid">
+
+            <div class="info-box">
+                <h3>🚗 Vehicle Information</h3>
+                <div class="info-item"><span>Country</span><span>{{ data.vehicle.country.name }}</span></div>
+                <div class="info-item"><span>License Plate</span><span>{{ data.vehicle.license_plate }}</span></div>
+                <div class="info-item"><span>Vehicle Type</span><span>{{ data.vehicle.vehicle_type }}</span></div>
+                <div class="info-item"><span>Manufacturer</span><span>{{ data.vehicle.manufacturer }}</span></div>
+                <div class="info-item"><span>Model</span><span>{{ data.vehicle.model }}</span></div>
+                <div class="info-item"><span>Variant</span><span>{{ data.vehicle.variant }}</span></div>
+                <div class="info-item"><span>Color</span><span>{{ data.vehicle.color }}</span></div>
+                <div class="info-item"><span>Fuel Type</span><span>{{ data.vehicle.fuel_type }}</span></div>
+                <div class="info-item"><span>Reg. Year</span><span>{{ data.vehicle.registration_year }}</span></div>
+                <div class="info-item"><span>Reg. Validity</span>
+                    <span class="{% if data.vehicle.registration_valid %}green{% else %}red{% endif %}">
+                        {{ data.vehicle.registration_valid|yesno:"Valid,Expired" }}
+                    </span>
+                </div>
+                <div class="info-item"><span>Engine Capacity</span><span>{{ data.vehicle.engine_capacity }} cc</span></div>
+                <div class="info-item"><span>Emission Norm</span><span>{{ data.vehicle.emission_norm }}</span></div>
+                <div class="info-item"><span>Chassis No</span><span>{{ data.vehicle.chassis_number }}</span></div>
+                <div class="info-item"><span>Engine No</span><span>{{ data.vehicle.engine_number }}</span></div>
+            </div>
+
+            <div class="info-box">
+                <h3>👤 Owner Profile</h3>
+                <button class="btn-edit" onclick="openModal()">Edit</button>
+                <div class="info-item"><span>Full Name</span><span>{{ data.owner.full_name }}</span></div>
+                <div class="info-item"><span>Date of Birth</span><span>{{ data.owner.date_of_birth|default:"N/A" }}</span></div>
+                <div class="info-item"><span>Gender</span><span>{{ data.owner.gender|default:"N/A" }}</span></div>
+                <div class="info-item"><span>Address</span><span style="text-align: right;">{{ data.owner.address|default:"N/A" }}</span></div>
+                <div class="info-item"><span>City / State</span><span>{{ data.owner.city|default:"N/A" }}, {{ data.owner.state|default:"N/A" }}</span></div>
+                <div class="info-item"><span>Contact</span><span>{{ data.owner.contact_number|default:"N/A" }}</span></div>
+                <div class="info-item"><span>Nationality</span><span>{{ data.owner.nationality|default:"N/A" }}</span></div>
+                <div class="info-item"><span>Email</span><span>{{ data.owner.email }}</span></div>
+            </div>
+
+            <div class="info-box">
+                <h3>🪪 Driving License</h3>
+                {% if data.owner.drivinglicense %}
+                    <div class="info-item"><span>License Number</span><span>{{ data.owner.drivinglicense.license_number }}</span></div>
+                    <div class="info-item"><span>Issue Date</span><span>{{ data.owner.drivinglicense.issue_date }}</span></div>
+                    <div class="info-item"><span>Expiry Date</span><span>{{ data.owner.drivinglicense.expiry_date }}</span></div>
+                    <div class="info-item"><span>License Class</span><span>{{ data.owner.drivinglicense.license_class }}</span></div>
+                    <div class="info-item"><span>Issuing Authority</span><span>{{ data.owner.drivinglicense.issuing_authority }}</span></div>
+                {% else %}
+                    <p style="color:#aaa; text-align:center; padding-top: 10px;">No license data recorded.</p>
+                {% endif %}
+            </div>
+
+            <div class="info-box">
+                <h3>🛡 Insurance Details</h3>
+                {% if data.insurance %}
+                    <div class="info-item"><span>Provider</span><span>{{ data.insurance.provider }}</span></div>
+                    <div class="info-item"><span>Policy Number</span><span>{{ data.insurance.policy_number }}</span></div>
+                    <div class="info-item"><span>Policy Type</span><span>{{ data.insurance.policy_type }}</span></div>
+                    <div class="info-item"><span>Start Date</span><span>{{ data.insurance.start_date }}</span></div>
+                    <div class="info-item"><span>Expiry Date</span><span>{{ data.insurance.expiry_date }}</span></div>
+                    <div class="info-item"><span>Status</span>
+                        <span class="{% if data.insurance.active %}green{% else %}red{% endif %}">
+                            {{ data.insurance.active|yesno:"Active,Expired" }}
+                        </span>
+                    </div>
+                {% else %}
+                    <p style="color:#aaa; text-align:center; padding-top: 10px;">No insurance data recorded.</p>
+                {% endif %}
+            </div>
+
+            <div class="info-box">
+                <h3>📄 Vehicle Documents</h3>
+                {% if data.vehicle.documents %}
+                    <div class="info-item"><span>Registration Cert.</span>
+                        <span class="{{ data.vehicle.documents.registration_certificate|yesno:'green,red' }}">
+                            {{ data.vehicle.documents.registration_certificate|yesno:"Available,Missing" }}
+                        </span>
+                    </div>
+                    <div class="info-item"><span>Insurance Doc.</span>
+                        <span class="{{ data.vehicle.documents.insurance_document|yesno:'green,red' }}">
+                            {{ data.vehicle.documents.insurance_document|yesno:"Available,Missing" }}
+                        </span>
+                    </div>
+                    <div class="info-item"><span>Pollution Cert.</span>
+                        <span class="{{ data.vehicle.documents.pollution_certificate|yesno:'green,red' }}">
+                            {{ data.vehicle.documents.pollution_certificate|yesno:"Available,Missing" }}
+                        </span>
+                    </div>
+                    <div class="info-item"><span>Fitness Cert.</span>
+                        {% if data.vehicle.documents.fitness_certificate == 'Valid' %}
+                            <span class="green">Valid</span>
+                        {% elif data.vehicle.documents.fitness_certificate == 'Due Soon' %}
+                            <span class="yellow">Due Soon</span>
+                        {% else %}
+                            <span class="red">Expired</span>
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <p style="color:#aaa; text-align:center; padding-top: 10px;">No physical documents scanned.</p>
+                {% endif %}
+            </div>
+
+            <div class="info-box">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 10px; margin-bottom: 15px;">
+                    <h3 style="border:none; margin:0; padding:0;">⚠ Violations & Fines</h3>
+                    <span style="background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 12px; font-size: 0.85em;">
+                        {{ data.violations|length }} Total
+                    </span>
+                </div>
+
+                {% if data.violations %}
+                    {% for violation in data.violations %}
+                    <div class="violation-card {{ violation.is_paid|yesno:'paid,unpaid' }}" id="v-{{ violation.id }}">
+                        
+                        <div class="info-item" style="margin-bottom: 5px;">
+                            <span style="font-weight: bold; color: #ffc107;">{{ violation.get_violation_type_display }}</span>
+                            <span style="font-size: 0.85em; color: #bbb;">{{ violation.violation_date|date:"M d, Y" }}</span>
+                        </div>
+
+                        <div class="info-item" style="align-items: center; margin-bottom: 0;">
+                            <span>Fine: <strong class="red">${{ violation.fine_amount }}</strong></span>
+                            
+                            <div id="status-container-{{ violation.id }}">
+                                {% if not violation.is_paid %}
+                                    <button class="btn-action" onclick="processDatabasePayment('{{ violation.id }}','{{ violation.fine_amount }}')">Pay Now</button>
+                                {% else %}
+                                    <span class="status-badge paid">PAID</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if violation.accident %}
+                        <div style="margin-top: 8px; font-size: 0.8em; color: #ff4d4d; font-weight: bold;">
+                            ❗ Accident Involved
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="text-align: center; padding: 30px 10px;">
+                        <span class="green" style="font-size: 1.2em;">✓ Clean Driving Record</span>
+                        <p style="color:#aaa; font-size: 0.9em; margin-top: 5px;">No violations found.</p>
+                    </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </section>
+    {% endfor %}
+
+{% else %}
+    <div style="text-align:center; padding:50px 5%;">
+        <h2>Welcome, {{ owner_obj.full_name }}</h2>
+        <p style="color: #aaa; margin-top: 10px; margin-bottom: 30px;">Your Comms Link has not been assigned a vehicle by Command yet.</p>
+        <button class="btn-action" onclick="openModal()">Complete Your Profile in the meantime</button>
+    </div>
+{% endif %}
+
+<script>
+// Modal Controls
+function openModal() {
+    document.getElementById('profileModal').style.display = 'flex';
+}
+function closeModal() {
+    document.getElementById('profileModal').style.display = 'none';
+}
+
+function notify(msg) {
+    const toast = document.getElementById("toast");
+    toast.innerText = msg;
+    toast.style.display = "block";
+    setTimeout(() => toast.style.display = "none", 3000);
+}
+
+async function processDatabasePayment(violationId, amount){
+    if(!confirm("Securely process payment of $" + amount + " to the network?")) return;
+
+    try {
+        const response = await fetch(`/pay-fine/${violationId}/`, {
+            method:'POST',
+            headers:{'X-CSRFToken':'{{ csrf_token }}'}
+        });
+        if(response.ok){
+            const card = document.getElementById("v-" + violationId);
+            card.classList.add("paid");
+            card.classList.remove("unpaid");
+            
+            const container = document.getElementById("status-container-" + violationId);
+            container.innerHTML = '<span class="status-badge paid">PAID</span>';
+            notify("Payment of $" + amount + " successful and verified.");
+        } else {
+            notify("Payment failed. Please try again.");
+        }
+    } catch(err){
+        console.error(err);
+        notify("Error connecting to Command server.");
+    }
+}
+</script>
+
+</body>
+</html>

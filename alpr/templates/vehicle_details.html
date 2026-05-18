@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Details | {{ data.vehicle.license_plate }}</title>
+    <style>
+        /* Shared Theme Styles */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",sans-serif;}
+        body { 
+            background: linear-gradient(135deg,#1c3b57 0%,#0a0e17 100%); 
+            color:#fff; min-height: 100vh; padding: 0 0 50px 0;
+        }
+        nav { display: flex; justify-content: flex-end; align-items: center; padding: 2rem 6%; }
+        nav a { color: #ddd; text-decoration: none; margin-left: 2rem; font-weight: 500; transition: 0.3s; }
+        nav a:hover { color: #fff; }
+        
+        header { max-width: 1000px; margin: 20px auto 40px; text-align: center; }
+        h1 { font-weight: 300; font-size: 2.2rem; }
+        h1 span { font-weight: 700; color: #4caf50; }
+
+        .back-link {
+            display: inline-block;
+            margin: 0 auto 30px;
+            color: #4caf50;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+      
+        .info-grid {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 0 20px;
+        }
+
+        .info-box {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .info-box h3 {
+            border-bottom: 2px solid #444;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: #4caf50;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 0.95rem;
+        }
+        .info-item span:first-child { color: #aaa; }
+        .info-item span:last-child { font-weight: 600; text-align: right; }
+
+        .green { color: #4caf50; font-weight: bold; }
+        .red { color: #f44336; font-weight: bold; }
+        .yellow { color: #ffeb3b; font-weight: bold; }
+
+        .violation-card {
+            background: rgba(0,0,0,0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #f44336;
+        }
+        .violation-card.paid { border-left-color: #4caf50; }
+        
+        .status-badge { padding: 2px 8px; border-radius: 4px; font-size: 0.8em; font-weight: bold; }
+        .status-badge.paid { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+        .status-badge.unpaid { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="{% url 'home_page' %}">Home</a>    
+        <a href="{% url 'vehicle_intelligence' %}">Image Scanner</a>    
+        <a href="{% url 'upload_video' %}">Video Analysis</a>    
+        <a href="{% url 'vehicle_search' %}" style="color:#fff;">Database Search</a>
+    </nav>
+    
+    <header>
+        <a href="javascript:history.back()" class="back-link">← Back to Search Results</a>
+        <h1>Full <span>Details</span></h1>
+        <p style="color: #aaa;">Comprehensive overview for {{ data.vehicle.license_plate }}</p>
+    </header>
+
+    <div class="info-grid">
+
+        <div class="info-box">
+            <h3>🚗 Vehicle Information</h3>
+            <div class="info-item"><span>Country</span><span>{{ data.vehicle.country.name }}</span></div>
+            <div class="info-item"><span>License Plate</span><span>{{ data.vehicle.license_plate }}</span></div>
+            <div class="info-item"><span>Vehicle Type</span><span>{{ data.vehicle.vehicle_type }}</span></div>
+            <div class="info-item"><span>Manufacturer</span><span>{{ data.vehicle.manufacturer }}</span></div>
+            <div class="info-item"><span>Model</span><span>{{ data.vehicle.model }}</span></div>
+            <div class="info-item"><span>Variant</span><span>{{ data.vehicle.variant }}</span></div>
+            <div class="info-item"><span>Color</span><span>{{ data.vehicle.color }}</span></div>
+            <div class="info-item"><span>Fuel Type</span><span>{{ data.vehicle.fuel_type }}</span></div>
+            <div class="info-item"><span>Reg. Year</span><span>{{ data.vehicle.registration_year }}</span></div>
+            <div class="info-item"><span>Reg. Validity</span>
+                <span class="{% if data.vehicle.registration_valid %}green{% else %}red{% endif %}">
+                    {{ data.vehicle.registration_valid|yesno:"Valid,Expired" }}
+                </span>
+            </div>
+            <div class="info-item"><span>Engine Capacity</span><span>{{ data.vehicle.engine_capacity }} cc</span></div>
+            <div class="info-item"><span>Emission Norm</span><span>{{ data.vehicle.emission_norm }}</span></div>
+            <div class="info-item"><span>Chassis No</span><span>{{ data.vehicle.chassis_number }}</span></div>
+            <div class="info-item"><span>Engine No</span><span>{{ data.vehicle.engine_number }}</span></div>
+        </div>
+
+        <div class="info-box">
+            <h3>👤 Owner / Driver Information</h3>
+            <div class="info-item"><span>Full Name</span><span>{{ data.owner.full_name }}</span></div>
+            <div class="info-item"><span>Date of Birth</span><span>{{ data.owner.date_of_birth }}</span></div>
+            <div class="info-item"><span>Gender</span><span>{{ data.owner.gender }}</span></div>
+            <div class="info-item"><span>Address</span><span>{{ data.owner.address }}</span></div>
+            <div class="info-item"><span>City / State</span><span>{{ data.owner.city }}, {{ data.owner.state }}</span></div>
+            <div class="info-item"><span>Contact</span><span>{{ data.owner.contact_number }}</span></div>
+            <div class="info-item"><span>Nationality</span><span>{{ data.owner.nationality }}</span></div>
+            <div class="info-item"><span>Email</span><span>{{ data.owner.email }}</span></div>
+        </div>
+
+        <div class="info-box">
+            <h3>🪪 Driving License Information</h3>
+            <div class="info-item"><span>License Number</span><span>{{ data.license.license_number }}</span></div>
+            <div class="info-item"><span>Issue Date</span><span>{{ data.license.issue_date }}</span></div>
+            <div class="info-item"><span>Expiry Date</span><span>{{ data.license.expiry_date }}</span></div>
+            <div class="info-item"><span>License Class</span><span>{{ data.license.license_class }}</span></div>
+            <div class="info-item"><span>Issuing Authority</span><span>{{ data.license.issuing_authority }}</span></div>
+        </div>
+
+        <div class="info-box">
+            <h3>🛡 Insurance Information</h3>
+            <div class="info-item"><span>Provider</span><span>{{ data.insurance.provider }}</span></div>
+            <div class="info-item"><span>Policy Number</span><span>{{ data.insurance.policy_number }}</span></div>
+            <div class="info-item"><span>Policy Type</span><span>{{ data.insurance.policy_type }}</span></div>
+            <div class="info-item"><span>Start Date</span><span>{{ data.insurance.start_date }}</span></div>
+            <div class="info-item"><span>Expiry Date</span><span>{{ data.insurance.expiry_date }}</span></div>
+            <div class="info-item"><span>Status</span>
+                <span class="{% if data.insurance.active %}green{% else %}red{% endif %}">
+                    {{ data.insurance.active|yesno:"Active,Expired" }}
+                </span>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <h3>📄 Vehicle Documents</h3>
+            <div class="info-item"><span>Registration Cert.</span>
+                <span class="{{ data.vehicle.documents.registration_certificate|yesno:'green,red' }}">
+                    {{ data.vehicle.documents.registration_certificate|yesno:"Available,Missing" }}
+                </span>
+            </div>
+            <div class="info-item"><span>Insurance Doc.</span>
+                <span class="{{ data.vehicle.documents.insurance_document|yesno:'green,red' }}">
+                    {{ data.vehicle.documents.insurance_document|yesno:"Available,Missing" }}
+                </span>
+            </div>
+            <div class="info-item"><span>Pollution Cert.</span>
+                <span class="{{ data.vehicle.documents.pollution_certificate|yesno:'green,red' }}">
+                    {{ data.vehicle.documents.pollution_certificate|yesno:"Available,Missing" }}
+                </span>
+            </div>
+            <div class="info-item"><span>Fitness Cert.</span>
+                {% if data.vehicle.documents.fitness_certificate == 'Valid' %}
+                    <span class="green">Valid</span>
+                {% elif data.vehicle.documents.fitness_certificate == 'Due Soon' %}
+                    <span class="yellow">Due Soon</span>
+                {% else %}
+                    <span class="red">Expired</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #444; padding-bottom: 10px; margin-bottom: 15px;">
+                <h3 style="margin: 0; border: none; padding: 0;">⚠ Violation & History</h3>
+                <span class="count-badge" style="background: #444; padding: 2px 10px; border-radius: 12px; font-size: 0.9em;">
+                    {{ data.violations|length }} Total
+                </span>
+            </div>
+
+            {% if data.violations %}
+                {% for violation in data.violations %}
+                <div class="violation-card {{ violation.is_paid|yesno:'paid,unpaid' }}">
+                    
+                    <div class="info-item" style="display: flex; justify-content: space-between; margin-bottom: 5px; border:none; padding:0;">
+                        <span style="font-weight: bold; color: #ffc107;">{{ violation.get_violation_type_display }}</span>
+                        <span style="font-size: 0.85em; color: #bbb;">{{ violation.violation_date|date:"M d, Y" }}</span>
+                    </div>
+
+                    <div class="info-item" style="display: flex; justify-content: space-between; align-items: center; border:none; padding:0; margin-top:5px;">
+                        <span>Fine: <strong class="red">${{ violation.fine_amount }}</strong></span>
+                        
+                        <span class="status-badge {{ violation.is_paid|yesno:'paid,unpaid' }}">
+                            {{ violation.is_paid|yesno:"PAID,UNPAID" }}
+                        </span>
+                    </div>
+
+                    {% if violation.accident %}
+                    <div style="margin-top: 8px; font-size: 0.8em; color: #ff4d4d; font-weight: bold;">
+                        ❗ Accident Involved
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="info-item" style="text-align: center; padding: 20px; border:none;">
+                    <span class="green" style="font-weight: bold;">✓ Clean Driving Record</span>
+                </div>
+            {% endif %}
+        </div>
+
+    </div> 
+
+</body>
+</html>

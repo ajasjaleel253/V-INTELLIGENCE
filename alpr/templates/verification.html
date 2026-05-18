@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Verification | Admin Portal</title>
+    <style>
+        /* ================= GLOBAL THEME ================= */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",sans-serif;}
+        body { 
+            background: linear-gradient(135deg,#1c3b57 0%,#0a0e17 100%); 
+            color:#fff; min-height: 100vh; padding: 40px 20px;
+        }
+
+        /* ================= HEADER ================= */
+        header { max-width: 1000px; margin: 0 auto 40px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+        h1 { font-weight: 300; font-size: 2.2rem; }
+        h1 span { font-weight: 700; color: #4caf50; }
+        .subtitle { color: #aaa; margin-top: 5px; }
+
+        /* ================= GRID LAYOUT ================= */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ================= VEHICLE CARD ================= */
+        .card {
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 25px;
+            transition: 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
+
+        .status-safe { border-left: 5px solid #4caf50; } 
+        .status-danger { border-left: 5px solid #f44336; } 
+        .status-unknown { border-left: 5px solid #9e9e9e; }
+
+        .plate-header {
+            background: #fff;
+            color: #000;
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            border: 2px solid #000;
+            font-family: 'Consolas', monospace;
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            align-self: flex-start;
+        }
+
+        .owner-info h2 { font-size: 1.1rem; margin-bottom: 4px; }
+        .owner-info p { color: #aaa; font-size: 0.9rem; margin-bottom: 15px; }
+
+        /* ================= DOCS LIST ================= */
+        .docs-list { list-style: none; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;}
+        .doc-item { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        
+        .badge { padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .badge-valid { background: rgba(76, 175, 80, 0.2); color: #4caf50; }
+        .badge-expired { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+        
+        .violation-box {
+            margin: 15px 0;
+            background: rgba(244, 67, 54, 0.1);
+            border: 1px solid #f44336;
+            padding: 10px;
+            border-radius: 6px;
+            color: #ff8a80;
+            font-size: 0.85rem;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .safe-box {
+            margin-top: 15px;
+            text-align: center;
+            color: #4caf50;
+            font-size: 0.9rem;
+            padding: 10px;
+            background: rgba(76, 175, 80, 0.1);
+            border-radius: 6px;
+        }
+
+        /* ================= ACTION BUTTONS ================= */
+        .action-area { margin-top: auto; padding-top: 15px; }
+        .btn-group { display: flex; gap: 10px; }
+        .btn-action {
+            flex: 1;
+            padding: 8px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+            transition: 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn-email { background: #2196f3; }
+        .btn-sms { background: #ff9800; }
+        .btn-details { background: #607d8b; margin-top: 15px; display: block; padding: 10px; } /* ADDED FOR MORE DETAILS BUTTON */
+        .btn-action:hover { opacity: 0.8; transform: scale(1.02); }
+
+        .not-found { color: #aaa; font-style: italic; }
+        .nav-area { text-align: center; margin-top: 50px; }
+        .btn-home {
+            text-decoration: none; color: #fff; border: 1px solid #fff; padding: 10px 30px; border-radius: 30px; transition: 0.3s;
+        }
+        .btn-home:hover { background: white; color: #000; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Database <span>Verification</span></h1>
+        <p class="subtitle">Cross-referencing detected plates with central registry.</p>
+    </header>
+
+    <div class="grid-container">
+        
+        {% for vehicle in verified_vehicles %}
+            
+            {% if vehicle.found %}
+                <div class="card {% if vehicle.has_violation or not vehicle.insurance_valid or not vehicle.puc_valid or not vehicle.rc_valid %}status-danger{% else %}status-safe{% endif %}">
+                    
+                    <div class="plate-header" id="plate-{{ forloop.counter }}">{{ vehicle.plate }}</div>
+                    
+                    <div class="owner-info">
+                        <h2 id="name-{{ forloop.counter }}">{{ vehicle.owner }}</h2>
+                        <p id="model-{{ forloop.counter }}">{{ vehicle.model }}</p>
+                    </div>
+
+                    <ul class="docs-list">
+                        <li class="doc-item">
+                            <span>Insurance</span>
+                            <span class="badge {% if vehicle.insurance_valid %}badge-valid{% else %}badge-expired{% endif %}">
+                                {% if vehicle.insurance_valid %}Active{% else %}Expired{% endif %}
+                            </span>
+                        </li>
+
+                        <li class="doc-item">
+                            <span>Pollution (PUC)</span>
+                            <span class="badge {% if vehicle.puc_valid %}badge-valid{% else %}badge-expired{% endif %}">
+                                {% if vehicle.puc_valid %}Valid{% else %}Expired{% endif %}
+                            </span>
+                        </li>
+
+                       <li class="doc-item">
+                            <span>Reg. Certificate (RC)</span>
+                            
+                            <span class="badge {% if vehicle.rc_valid %}badge-valid{% else %}badge-expired{% endif %}">
+                                {% if vehicle.rc_valid %}
+                                    Verified
+                                {% else %}
+                                    Invalid
+                                {% endif %}
+                            </span>
+                        </li>
+                    {% if vehicle.has_violation or not vehicle.insurance_valid or not vehicle.puc_valid or not vehicle.rc_valid %}
+                        <div class="violation-box">
+                            <span>⚠️</span>
+                            <div>
+                                <strong>Issues Detected</strong><br>
+                                {% if vehicle.has_violation %}Fines: ${{ vehicle.fines }}{% else %}Documents Missing{% endif %}
+                            </div>
+                        </div>
+
+                        <div class="action-area">
+                            <div class="btn-group">
+                                <button class="btn-action btn-email" onclick="sendNotice('{{ vehicle.plate }}', '{{ vehicle.owner }}', '{{ vehicle.model }}', 'email')">📧 Email</button>
+                                <button class="btn-action btn-sms" onclick="sendNotice('{{ vehicle.plate }}', '{{ vehicle.owner }}', '{{ vehicle.model }}', 'sms')">📱 SMS</button>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="safe-box">
+                            ✓ All Clear
+                        </div>
+                    {% endif %}
+
+                    <a href="{% url 'vehicle_details' vehicle.plate %}" class="btn-action btn-details">🔍 View Full Details</a>
+
+                </div>
+
+            {% else %}
+                <div class="card status-unknown">
+                    <div class="plate-header">{{ vehicle.plate }}</div>
+                    <p class="not-found">
+                        Not found in registry.<br>
+                        Manual check required.
+                    </p>
+                </div>
+            {% endif %}
+
+        {% endfor %}
+
+    </div>
+
+    <div class="nav-area">
+        <a href="{% url 'upload_video' %}" class="btn-home">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        function sendNotice(plate, owner, model, type) {
+            let message = "";
+            let fileName = type + "_notice_" + plate + ".txt";
+
+            if (type === 'email') {
+                message = `Subject: URGENT: Vehicle Documentation Alert - ${plate}\n\n` +
+                          `Dear ${owner},\n\n` +
+                          `Our automated traffic system has detected your vehicle (${model}) with plate number ${plate}.\n` +
+                          `Our records indicate missing documentation or unpaid violations.\n\n` +
+                          `Please log in to the portal to settle your dues and update your documents immediately.\n\n` +
+                          `Regards,\nTraffic Department Admin`;
+            } else {
+                message = `MSG: Hi ${owner}, your vehicle ${plate} has pending traffic violations or expired documents. Please clear them ASAP to avoid vehicle impounding. - Traffic Dept.`;
+            }
+
+            // SIMULATING DOWNLOAD
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(message));
+            element.setAttribute('download', fileName);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+
+            alert(type.toUpperCase() + " draft generated for " + owner);
+        }
+    </script>
+
+</body>
+</html>

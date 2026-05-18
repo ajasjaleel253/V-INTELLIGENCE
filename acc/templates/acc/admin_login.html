@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Login</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:"Segoe UI",sans-serif;}
+body{
+    background: linear-gradient(135deg,#1c3b57 0%,#0a0e17 100%);
+    color:#fff;min-height:100vh;
+    display:flex;align-items:center;justify-content:center;
+}
+.login-box{
+    width:100%;max-width:450px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(15px);
+    border-radius:20px;
+    padding:50px 40px;
+    border:1px solid rgba(255,255,255,0.1);
+}
+.login-header{text-align:center;margin-bottom:30px;}
+.login-header h2 span{color:#ff2a6d;}
+
+.input-group{margin-bottom:20px;}
+.input-group label{display:block;font-size:.85rem;color:#ccc;margin-bottom:8px;}
+.input-group input{
+    width:100%;padding:14px;
+    background:rgba(0,0,0,0.3);
+    border:1px solid rgba(255,255,255,0.1);
+    border-radius:8px;color:#fff;
+}
+.btn-main{
+    width:100%;padding:14px;
+    background:#ff2a6d;color:#fff;
+    border:none;border-radius:50px;
+    font-weight:bold;cursor:pointer;
+}
+.alert-box{padding:10px;margin-bottom:15px;border-radius:6px;text-align:center;background:rgba(255,42,109,0.2);color:#ff2a6d;}
+.switch-link{text-align:center;margin-top:20px;}
+.switch-link a{color:#3dff88;text-decoration:none;}
+</style>
+</head>
+
+<body>
+<div class="login-box">
+
+<div class="login-header">
+    <h2>Admin <span>Access</span></h2>
+</div>
+
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert-box">{{ message }}</div>
+    {% endfor %}
+{% endif %}
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="input-group">
+        <label>Admin Username</label>
+        <input type="text" name="username" required>
+    </div>
+
+    <div class="input-group">
+        <label>Admin Password</label>
+        <input type="password" name="password" required>
+    </div>
+
+    <button type="submit" class="btn-main">Login</button>
+</form>
+
+<div class="switch-link">
+    <a href="{% url 'user_login' %}">User Login</a>
+</div>
+
+</div>
+</body>
+</html>

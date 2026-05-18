@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Processing Status</title>
+    
+    {% if not video.is_processed %}
+    <meta http-equiv="refresh" content="5">
+    {% endif %}
+
+    <style>
+        /* ================= GLOBAL ================= */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",sans-serif;}
+        body { 
+            background: linear-gradient(135deg,#1c3b57 0%,#0a0e17 100%); 
+            color:#fff; 
+            min-height: 100vh;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ================= BLOBS ================= */
+        .blob { position:absolute; border-radius:50%; filter:blur(90px); opacity:0.6; z-index:-1;}
+        .blob-1 { top:-10%; left:-10%; width:500px; height:500px; background:#2a5298;}
+        .blob-2 { bottom:-10%; right:-10%; width:600px; height:600px; background:#4a1c40; }
+
+        /* ================= NAV ================= */
+        nav { display:flex; justify-content:flex-end; align-items: center; padding:2rem 6%; }
+        nav a { color:#ddd; text-decoration:none; margin-left:2rem; font-weight:500; transition: 0.3s;}
+        nav a:hover { color:#fff; }
+        .btn-contact { border:2px solid white; padding:6px 20px; border-radius:4px; font-weight:600; }
+        .btn-contact:hover { background: white; color: #0a0e17; }
+
+        /* ================= CONTAINER & CARD ================= */
+        .main-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .result-card {
+            width: 100%;
+            max-width: 800px;
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        h1 { font-weight: 300; font-size: 2.5rem; margin-bottom: 20px; }
+
+        /* ================= STATUS BADGE ================= */
+        .status-badge {
+            display: inline-block;
+            padding: 8px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9rem;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        /* ================= VIDEO ================= */
+        .video-wrapper {
+            width: 100%;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            margin-bottom: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        video { width: 100%; display: block; }
+
+        /* ================= ACTION BUTTONS ================= */
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+ 
+        .next-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(90deg, #4caf50, #2e7d32); /* Green for "Go" */
+            color: white;
+            text-decoration: none;
+            padding: 15px 50px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .next-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(76, 175, 80, 0.4);
+        }
+        
+  
+        .csv-btn {
+            color: #ddd;
+            text-decoration: none;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 25px;
+            border-radius: 20px;
+            transition: 0.3s;
+        }
+        .csv-btn:hover { background: rgba(255,255,255,0.1); color: #fff; border-color: #fff;}
+
+        .back-link {
+            color: #666;
+            text-decoration: none;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            transition: 0.3s;
+        }
+        .back-link:hover { color: #aaa; }
+
+        /* ================= LOADER ================= */
+        .loader-container { padding: 40px 0; }
+        .loader {
+            width: 48px; height: 48px;
+            border: 5px solid rgba(255,255,255,0.1);
+            border-bottom-color: #fff;
+            border-radius: 50%;
+            display: inline-block;
+            animation: rotation 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { color: #ccc; line-height: 1.6; }
+
+    </style>
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav>
+        <a href="{% url 'home_page' %}">Home</a>     
+        <a href="{% url 'vehicle_intelligence' %}">Image Scanner</a>     
+        <a href="{% url 'upload_video' %}" style="color:#fff;">Video Analysis</a>     
+        <a href="{% url 'vehicle_search' %}">Database Search</a>
+    </nav>
+
+    <div class="main-container">
+        <div class="result-card">
+            <h1>Analysis Status</h1>
+            
+            <div class="status-badge">
+                {{ video.status }}
+            </div>
+
+            {% if video.is_processed %}
+                <div class="video-wrapper">
+                    <video controls>
+                        <source src="{{ video.processed_video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+
+                <div class="action-area">
+                    <a href="{% url 'vehicle_verification_list' video.id %}" class="next-btn">
+                        Proceed to Verification →
+                    </a>
+
+                    <a href="{{ video.csv_file.url }}" class="csv-btn">
+                        Download Raw CSV Data
+                    </a>
+                    
+                    <a href="{% url 'upload_video' %}" class="back-link">
+                        Process Another Video
+                    </a>
+                </div>
+
+            {% else %}
+                
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <p class="loading-text">
+                        Our AI model is currently detecting license plates.<br>
+                        Please wait, this page will refresh automatically.
+                    </p>
+                </div>
+
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

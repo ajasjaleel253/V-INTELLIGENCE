@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ALPR Upload</title>
+    <style>
+        /* ================= GLOBAL ================= */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",sans-serif;}
+        body { background: linear-gradient(135deg,#1c3b57 0%,#0a0e17 100%); color:#fff; min-height: 100vh; overflow-x: hidden; }
+
+        /* ================= BLOBS ================= */
+        .blob { position:absolute; border-radius:50%; filter:blur(90px); opacity:0.6; z-index:-1;}
+        .blob-1 { top:-10%; left:-10%; width:500px; height:500px; background:#2a5298;}
+        .blob-2 { bottom:-10%; right:-10%; width:600px; height:600px; background:#4a1c40; }
+
+        /* ================= NAV ================= */
+        nav { display:flex; justify-content:flex-end; align-items: center; padding:2rem 6%; }
+        nav a { color:#ddd; text-decoration:none; margin-left:2rem; font-weight:500; transition: 0.3s;}
+        nav a:hover { color:#fff; }
+        .btn-contact { border:2px solid white; padding:6px 20px; border-radius:4px; font-weight:600; }
+        .btn-contact:hover { background: white; color: #0a0e17; }
+
+        /* ================= HERO ================= */
+        .hero-container { display:flex; align-items:center; justify-content:space-between; padding:0 10%; height:calc(100vh - 120px);}
+        .text-content { flex:1; border-left:5px solid white; padding-left:30px;}
+        .text-content h1 { font-size:3.2rem; font-weight:300; line-height: 1.2;}
+        .text-content h1 span { font-weight:700; display: block;}
+        .text-content p { margin-top:15px; max-width:500px; color:#ccc; line-height:1.6; }
+
+        /* ================= UPLOAD ================= */
+        .upload-section { flex:1; display:flex; flex-direction: column; align-items:center; justify-content:center; }
+        
+        /* The Form needs to be the container for the upload box */
+        .upload-form { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+        .upload-box { 
+            width:380px; height:240px; 
+            background: rgba(255,255,255,0.06); 
+            backdrop-filter:blur(12px); 
+            border-radius:16px; 
+            border:1px dashed rgba(255,255,255,0.4); 
+            display:flex; flex-direction:column; 
+            align-items:center; justify-content:center; 
+            cursor:pointer; transition:0.3s; 
+            position:relative; overflow:hidden;
+            margin-bottom: 20px;
+        }
+        
+        .upload-box:hover { transform:translateY(-6px); background: rgba(255,255,255,0.1); border-color: #fff;}
+        .upload-box input { display:none; }
+        .upload-icon { margin-bottom: 10px; opacity: 0.8; }
+        .upload-text { font-size:1.2rem; font-weight:600; text-align: center; padding: 0 20px;}
+        .upload-subtext { font-size: 0.85rem; color: #aaa; margin-top: 5px; }
+
+        /* Added Style for the Submit Button */
+        .submit-btn {
+            background: linear-gradient(90deg, #2a5298, #1c3b57);
+            color: white;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .submit-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .hero-container { flex-direction: column; text-align: center; height: auto; padding-top: 2rem;}
+            .text-content { border-left: none; border-bottom: 3px solid white; padding-left: 0; padding-bottom: 20px; margin-bottom: 40px; }
+            .upload-box { width: 100%; max-width: 380px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav>
+        <a href="{% url 'home_page' %}">Home</a>     
+        <a href="{% url 'vehicle_intelligence' %}">Image Scanner</a>     
+        <a href="{% url 'upload_video' %}" style="color:#fff;">Video Analysis</a>     
+        <a href="{% url 'vehicle_search' %}">Database Search</a>
+    </nav>
+    
+
+    <div class="hero-container">
+        
+        <div class="text-content">
+            <h1>Vehicle <span>License Plate</span> Recognition</h1>
+            <p>Upload your traffic surveillance footage to automatically detect and extract license plate numbers using our advanced AI model.</p>
+        </div>
+
+        <div class="upload-section">
+            <form method="post" enctype="multipart/form-data" class="upload-form">
+                {% csrf_token %}
+                
+                <label class="upload-box" for="videoInput">
+                    <input type="file" name="video" accept="video/*" required id="videoInput">
+                    
+                    <div class="upload-icon">
+                        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                    </div>
+                    <span class="upload-text" id="fileName">Click to Upload Video</span>
+                    <span class="upload-subtext">Supported formats: MP4, AVI, MOV</span>
+                </label>
+
+                <button type="submit" class="submit-btn">Start Processing</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+      
+        document.getElementById('videoInput').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const fileName = e.target.files[0].name;
+                document.getElementById('fileName').innerText = fileName;
+                document.querySelector('.upload-box').style.borderColor = '#4caf50';
+            }
+        });
+    </script>
+</body>
+</html>

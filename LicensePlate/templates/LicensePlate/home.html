@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>V-Intelligence | Central Command</title>
+    <style>
+        /* ================= GLOBAL THEME ================= */
+        * { margin:0; padding:0; box-sizing:border-box; font-family:"Segoe UI",sans-serif; scroll-behavior: smooth;}
+        body { background: linear-gradient(135deg,#1c3b57 0%,#0a0e17 100%); color:#fff; overflow-x: hidden; }
+
+        .blob { position:fixed; border-radius:50%; filter:blur(90px); opacity:0.3; z-index:-1;}
+        .blob-1 { top:10%; left:-5%; width:500px; height:500px; background:#2a5298;}
+        .blob-2 { bottom:10%; right:-5%; width:600px; height:600px; background:#4a1c40; }
+
+        /* ================= NAV ================= */
+        nav { display:flex; justify-content:flex-end; align-items: center; padding:2rem 6%; }
+        nav a { color:#ddd; text-decoration:none; margin-left:2rem; font-weight:500; transition: 0.3s;}
+        nav a:hover { color:#fff; }
+        .btn-contact { border:2px solid white; padding:6px 20px; border-radius:4px; font-weight:600; }
+        .btn-contact:hover { background: white; color: #0a0e17; }
+
+
+        /* ================= SECTION STYLING ================= */
+        section {
+            min-height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 10%;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .container {
+            max-width: 1100px;
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        section:nth-child(even) .container { flex-direction: row-reverse; }
+
+        .text-side { flex: 1; }
+        .visual-side { 
+            flex: 1; 
+            background: rgba(255,255,255,0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            transition: 0.4s;
+        }
+        .visual-side:hover { border-color: #3dff88; transform: scale(1.02); }
+
+        h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 20px; color: #3dff88; }
+        h2 { font-size: 2.5rem; margin-bottom: 20px; font-weight: 300; }
+        h2 span { font-weight: 700; color: #3dff88; }
+        p { font-size: 1.1rem; line-height: 1.8; color: #ccc; margin-bottom: 30px; }
+
+        .btn-main {
+            display: inline-block;
+            padding: 12px 35px;
+            background: #fff;
+            color: #000;
+            text-decoration: none;
+            font-weight: 700;
+            border-radius: 50px;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-main:hover { background: #3dff88; transform: translateY(-3px); }
+
+        .icon-large { font-size: 5rem; margin-bottom: 20px; display: block; }
+        
+  
+        .nav-dots { position: fixed; right: 30px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 15px; }
+        .dot { width: 12px; height: 12px; background: rgba(255,255,255,0.2); border-radius: 50%; }
+    </style>
+</head>
+<body>
+
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <nav>
+        <a href="{% url 'home_page' %}">Home</a>     
+        <a href="{% url 'vehicle_intelligence' %}">Image Scanner</a>     
+        <a href="{% url 'upload_video' %}" style="color:#fff;">Video Analysis</a>     
+        <a href="{% url 'vehicle_search' %}">Database Search</a>
+    </nav>
+
+    <section id="hero">
+        <div class="container" style="text-align: center; flex-direction: column;">
+            <h1>V-INTELLIGENCE</h1>
+            <p style="max-width: 700px; margin: 0 auto 40px;">
+                Welcome to the Unified Vehicle Management System. This platform integrates Deep Learning, 
+                Computer Vision, and Geospatial tracking to provide a complete overview of traffic compliance 
+                and vehicle documentation. Explore the modules below to begin.
+            </p>
+            <a href="#scanner" class="btn-main">Get Started ↓</a>
+        </div>
+    </section>
+
+    <section id="scanner">
+        <div class="container">
+            <div class="text-side">
+                <h2>Image <span>Intelligence</span></h2>
+                <p>
+                    Our high-precision Image Scanner allows you to upload any vehicle photograph to extract information instantly. 
+                    Using OCR and optimized detection models, the system identifies the license plate and cross-references it with 
+                    our global registry to reveal owner details, insurance status, and historical violations.
+                </p>
+                <a href="{% url 'vehicle_intelligence' %}" class="btn-main">Launch Scanner</a>
+            </div>
+            <div class="visual-side">
+                <span class="icon-large">📸</span>
+                <div style="font-family: monospace; color: #3dff88;">[ SCAN_MODE: ACTIVE ]</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="video">
+        <div class="container">
+            <div class="text-side">
+                <h2>Video <span>Analysis</span></h2>
+                <p>
+                    Go beyond static images. The Video Analysis module processes surveillance footage frame-by-frame, 
+                    detecting every vehicle that passes through the line of sight. It generates comprehensive CSV reports 
+                    and visual overlays, allowing for batch verification of traffic flow and compliance across duration-based data.
+                </p>
+                <a href="{% url 'upload_video' %}" class="btn-main">Process Video</a>
+            </div>
+            <div class="visual-side">
+                <span class="icon-large">🎥</span>
+                <div style="font-family: monospace; color: #ff2a6d;">[ STREAM_ANALYSIS: READY ]</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="registry">
+        <div class="container">
+            <div class="text-side">
+                <h2>Central <span>Registry</span></h2>
+                <p>
+                    The backbone of the system is our Administrative Search tool. Access the vehicle registry to manage 
+                    documentation compliance. Administrators can filter through thousands of records, verify Pollution (PUC) 
+                    certificates, and issue official legal notices via email or SMS directly from the dashboard.
+                </p>
+                <a href="{% url 'vehicle_search' %}" class="btn-main">Search Database</a>
+            </div>
+            <div class="visual-side">
+                <span class="icon-large">🔍</span>
+                <div style="font-family: monospace; color: #2196f3;">[ DATABASE_SYNC: OK ]</div>
+            </div>
+        </div>
+    </section>
+
+    
+
+</body>
+</html>
