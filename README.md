@@ -18,8 +18,8 @@ The Administrative Search system acts as the core database management module of 
 Python
 OpenCV
 YOLO / Deep Learning Models
-OCR (EasyOCR / Tesseract)
-Django / Flask
+OCR (EasyOCR)
+Django
 MySQL Database
 HTML, CSS, JavaScript
 
