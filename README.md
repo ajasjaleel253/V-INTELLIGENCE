@@ -15,33 +15,33 @@ The Video Analysis module processes surveillance or traffic camera footage frame
 The Administrative Search system acts as the core database management module of the platform. Administrators can search and manage thousands of vehicle records efficiently. The dashboard supports document verification, PUC compliance monitoring, violation tracking, and automated notification systems through email or SMS for legal notices and alerts.
 
 ⚙️ Technologies Used
-Python
-OpenCV
-YOLO / Deep Learning Models
-OCR (EasyOCR)
-Django
-MySQL Database
+Python,
+OpenCV,
+YOLO / Deep Learning Models,
+OCR (EasyOCR),
+Django,
+MySQL Database,
 HTML, CSS, JavaScript
 
 🎯 Key Features
-Automatic License Plate Detection
-Real-Time Vehicle Monitoring
-Intelligent OCR-Based Text Recognition
-Traffic Violation Detection
-Video Surveillance Analysis
-CSV Report Generation
-Centralized Vehicle Database
-Administrative Dashboard
-Automated Compliance Verification
+Automatic License Plate Detection, 
+Real-Time Vehicle Monitoring, 
+Intelligent OCR-Based Text Recognition, 
+Traffic Violation Detection, 
+Video Surveillance Analysis, 
+CSV Report Generation, 
+Centralized Vehicle Database, 
+Administrative Dashboard, 
+Automated Compliance Verification 
 
 
 🌍 Applications
 This system can be used in:
-Smart City Infrastructure
-Traffic Monitoring Systems
-Toll Booth Automation
-Parking Management
+Smart City Infrastructure,  
+Traffic Monitoring Systems,    
+Toll Booth Automation, 
+Parking Management, 
+Law Enforcement Agencies 
 
-Law Enforcement Agencies
 Highway Surveillance Systems
 Vehicle Documentation Verification
