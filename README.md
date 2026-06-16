@@ -40,12 +40,16 @@ The Image Scanner module enables users to upload vehicle images for automatic li
 ### 🎥 2. Video Analysis Module
 The Video Analysis module processes surveillance or traffic camera footage frame-by-frame to detect and track vehicles in real-time. It automatically identifies license plates from moving vehicles, generates analytical reports in CSV format, and provides visual overlays for monitoring traffic activity. This module is vital for smart traffic management, law enforcement, and automated compliance checking.
 
-| | |
+| Real-Time Tracking | Detection Overlays |
 | :---: | :---: |
-| <img src="https://github.com/user-attachments/assets/f88c6f4d-f1d0-4458-896d-ed0ff178128e" width="100%"> | <img src="https://github.com/user-attachments/assets/442caae4-93a5-4e4d-8dfb-ebf1e6538784" width="100%"> |
-| <img src="https://github.com/user-attachments/assets/18c39a0c-6b52-416e-9dab-dea83afab010" width="100%"> | <img src="https://github.com/user-attachments/assets/f3da3886-d92f-48cc-8c4a-60eac91c4278" width="100%"> |
+| <img src="https://github.com/user-attachments/assets/f88c6f4d-f1d0-4458-896d-ed0ff178128e" alt="Detection 1"> | <img src="https://github.com/user-attachments/assets/442caae4-93a5-4e4d-8dfb-ebf1e6538784" alt="Detection 2"> |
+| <img src="https://github.com/user-attachments/assets/18c39a0c-6b52-416e-9dab-dea83afab010" alt="Detection 3"> | <img src="https://github.com/user-attachments/assets/f3da3886-d92f-48cc-8c4a-60eac91c4278" alt="Detection 4"> |
 
-*(Below: Data analysis and heat-mapping preview)* <img src="https://github.com/user-attachments/assets/14340828-c6ae-4c52-9613-d8c494412ad9" width="60%">
+<br>
+
+**Data Analysis & Heat-mapping Preview:**
+
+<img src="https://github.com/user-attachments/assets/14340828-c6ae-4c52-9613-d8c494412ad9" alt="Data Analysis" width="800">
 
 
 ### 🔍 3. Central Registry & Administrative Dashboard
